@@ -19,52 +19,49 @@ export class GildedRose {
 
   updateQuality() {
     this.items.forEach((item) => {
-      if (
-        item.name != "Aged Brie" &&
-        item.name != "Backstage passes to a TAFKAL80ETC concert"
-      ) {
-        if (item.quality > 0) {
-          if (item.name != "Sulfuras, Hand of Ragnaros") {
-            item.quality = item.quality - 1;
-          }
-        }
-      } else {
-        if (item.quality < 50) {
-          item.quality = item.quality + 1;
-          if (item.name == "Backstage passes to a TAFKAL80ETC concert") {
-            if (item.sellIn < 11) {
-              if (item.quality < 50) {
-                item.quality = item.quality + 1;
-              }
-            }
-            if (item.sellIn < 6) {
-              if (item.quality < 50) {
-                item.quality = item.quality + 1;
-              }
-            }
-          }
-        }
-      }
-      if (item.name != "Sulfuras, Hand of Ragnaros") {
-        item.sellIn = item.sellIn - 1;
-      }
-      if (item.sellIn < 0) {
-        if (item.name != "Aged Brie") {
-          if (item.name != "Backstage passes to a TAFKAL80ETC concert") {
-            if (item.quality > 0) {
-              if (item.name != "Sulfuras, Hand of Ragnaros") {
-                item.quality = item.quality - 1;
-              }
-            }
+      switch (item.name) {
+        case "Aged Brie":
+          if (item.quality >= 50) break;
+
+          if (item.sellIn < 1) {
+            item.quality = item.quality + 2;
           } else {
-            item.quality = item.quality - item.quality;
-          }
-        } else {
-          if (item.quality < 50) {
             item.quality = item.quality + 1;
           }
-        }
+
+          break;
+        case "Backstage passes to a TAFKAL80ETC concert":
+          if (item.sellIn < 1) {
+            item.quality = 0;
+            break;
+          }
+
+          if (item.quality == 50) break;
+
+          if (item.sellIn < 6) {
+            item.quality = item.quality + Math.min(3, 50 - item.quality);
+          } else if (item.sellIn < 11) {
+            item.quality = item.quality + Math.min(2, 50 - item.quality);
+          } else {
+            item.quality = item.quality + Math.min(1, 50 - item.quality);
+          }
+
+          break;
+        case "Sulfuras, Hand of Ragnaros":
+          break;
+        default: // Normal items
+          if (item.quality == 0) break;
+
+          if (item.sellIn > 0) {
+            item.quality = item.quality - 1;
+          } else {
+            item.quality = item.quality - Math.min(item.quality, 2);
+          }
+          break;
       }
+
+      if (item.name != "Sulfuras, Hand of Ragnaros")
+        item.sellIn = item.sellIn - 1;
     });
 
     return this.items;
