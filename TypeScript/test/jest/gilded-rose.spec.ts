@@ -216,5 +216,29 @@ describe("Backstage passes", () => {
   });
 });
 
-// TODO: Multiple items
+describe("Multiple items", () => {
+  it("should update multiple items", () => {
+    // Arrange
+    const items = [
+      new Item("foo", 1, 1),
+      new Item("Aged Brie", 1, 1),
+      new Item("Sulfuras, Hand of Ragnaros", 1, 1),
+      new Item("Backstage passes to a TAFKAL80ETC concert", 1, 1),
+    ];
+    const sut = new GildedRose(items);
+
+    // Act
+    const actual = sut.updateQuality();
+
+    // Assert
+    expect(actual.length).toBe(4);
+    expect(actual[0]).toEqual(new Item("foo", 0, 0));
+    expect(actual[1]).toEqual(new Item("Aged Brie", 0, 2));
+    expect(actual[2]).toEqual(new Item("Sulfuras, Hand of Ragnaros", 1, 1));
+    expect(actual[3]).toEqual(
+      new Item("Backstage passes to a TAFKAL80ETC concert", 0, 4)
+    );
+  });
+});
+
 // TODO: Conjured?
