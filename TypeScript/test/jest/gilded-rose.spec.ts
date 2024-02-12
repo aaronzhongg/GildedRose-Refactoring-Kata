@@ -166,12 +166,17 @@ describe("Backstage passes", () => {
     expect(actual[0].quality).toBe(2);
   });
 
-  it.each([10, 6])(
+  it.each([
+    [10, 1, 3],
+    [6, 1, 3],
+    [6, 49, 50],
+    [6, 50, 50],
+  ])(
     "should increase quality by 2 when 10 >= sellIn > 5",
-    (sellIn) => {
+    (sellIn, quality, expectedQuality) => {
       // Arrange
       const normalItems = [
-        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, 1),
+        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, quality),
       ];
       const sut = new GildedRose(normalItems);
 
@@ -179,16 +184,22 @@ describe("Backstage passes", () => {
       const actual = sut.updateQuality();
 
       // Assert
-      expect(actual[0].quality).toBe(3);
+      expect(actual[0].quality).toBe(expectedQuality);
     }
   );
 
-  it.each([5, 1])(
+  it.each([
+    [5, 1, 4],
+    [1, 1, 4],
+    [1, 48, 50],
+    [1, 49, 50],
+    [1, 50, 50],
+  ])(
     "should increase quality by 3 when 5 >= sellIn > 0",
-    (sellIn) => {
+    (sellIn, quality, expectedQuality) => {
       // Arrange
       const normalItems = [
-        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, 1),
+        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, quality),
       ];
       const sut = new GildedRose(normalItems);
 
@@ -196,7 +207,7 @@ describe("Backstage passes", () => {
       const actual = sut.updateQuality();
 
       // Assert
-      expect(actual[0].quality).toBe(4);
+      expect(actual[0].quality).toBe(expectedQuality);
     }
   );
 
