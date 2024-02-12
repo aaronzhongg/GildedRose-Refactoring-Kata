@@ -1,4 +1,10 @@
-import { Item, GildedRose } from "@/gilded-rose";
+import {
+  Item,
+  GildedRose,
+  AgedBrie,
+  Sulfuras,
+  BackstagePass,
+} from "@/gilded-rose";
 
 describe("Gilded Rose", () => {
   it("should foo", () => {
@@ -84,7 +90,7 @@ describe("All items", () => {
 describe("Aged Brie", () => {
   it("should increase quality by 1", () => {
     // Arrange
-    const normalItems = [new Item("Aged Brie", 1, 1)];
+    const normalItems = [new AgedBrie(1, 1)];
     const sut = new GildedRose(normalItems);
 
     // Act
@@ -96,8 +102,8 @@ describe("Aged Brie", () => {
 
   it("should not increase quality above 50", () => {
     // Arrange
-    const normalItems = [new Item("Aged Brie", 1, 50)];
-    const sut = new GildedRose(normalItems);
+    const agedBrie = [new AgedBrie(1, 50)];
+    const sut = new GildedRose(agedBrie);
 
     // Act
     const actual = sut.updateQuality();
@@ -108,8 +114,8 @@ describe("Aged Brie", () => {
 
   it("should increase quality by 2 after sell by date", () => {
     // Arrange
-    const normalItems = [new Item("Aged Brie", -1, 48)];
-    const sut = new GildedRose(normalItems);
+    const agedBrie = [new AgedBrie(-1, 48)];
+    const sut = new GildedRose(agedBrie);
 
     // Act
     const actual = sut.updateQuality();
@@ -121,12 +127,11 @@ describe("Aged Brie", () => {
 
 describe("Sulfuras", () => {
   // BUG: Quality can be set to negative
+  // BUG: Quality can be set to something outside of 80
   it.each([-1, 0, 1, 50])("should not change quality", (sulfurasQuality) => {
     // Arrange
-    const normalItems = [
-      new Item("Sulfuras, Hand of Ragnaros", 0, sulfurasQuality),
-    ];
-    const sut = new GildedRose(normalItems);
+    const sulfuras = [new Sulfuras()];
+    const sut = new GildedRose(sulfuras);
 
     // Act
     const actual = sut.updateQuality();
@@ -138,10 +143,8 @@ describe("Sulfuras", () => {
   // BUG: SellIn can be set to negative
   it.each([-1, 0, 1, 50])("should not change sellIn", (sulfurasSellIn) => {
     // Arrange
-    const normalItems = [
-      new Item("Sulfuras, Hand of Ragnaros", sulfurasSellIn, 13),
-    ];
-    const sut = new GildedRose(normalItems);
+    const sulfuras = [new Sulfuras()];
+    const sut = new GildedRose(sulfuras);
 
     // Act
     const actual = sut.updateQuality();
@@ -154,10 +157,8 @@ describe("Sulfuras", () => {
 describe("Backstage passes", () => {
   it("should increase quality by 1 when sellIn > 10", () => {
     // Arrange
-    const normalItems = [
-      new Item("Backstage passes to a TAFKAL80ETC concert", 11, 1),
-    ];
-    const sut = new GildedRose(normalItems);
+    const backstagePass = [new BackstagePass(11, 1)];
+    const sut = new GildedRose(backstagePass);
 
     // Act
     const actual = sut.updateQuality();
@@ -175,10 +176,8 @@ describe("Backstage passes", () => {
     "should increase quality by 2 when 10 >= sellIn > 5",
     (sellIn, quality, expectedQuality) => {
       // Arrange
-      const normalItems = [
-        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, quality),
-      ];
-      const sut = new GildedRose(normalItems);
+      const backstagePass = [new BackstagePass(sellIn, quality)];
+      const sut = new GildedRose(backstagePass);
 
       // Act
       const actual = sut.updateQuality();
@@ -198,10 +197,8 @@ describe("Backstage passes", () => {
     "should increase quality by 3 when 5 >= sellIn > 0",
     (sellIn, quality, expectedQuality) => {
       // Arrange
-      const normalItems = [
-        new Item("Backstage passes to a TAFKAL80ETC concert", sellIn, quality),
-      ];
-      const sut = new GildedRose(normalItems);
+      const backstagePass = [new BackstagePass(sellIn, quality)];
+      const sut = new GildedRose(backstagePass);
 
       // Act
       const actual = sut.updateQuality();
@@ -214,10 +211,8 @@ describe("Backstage passes", () => {
   // BUG: Possible to create a Backstage pass with negative sellIn and positive quality
   it("should drop quality to 0 after sell by date passes", () => {
     // Arrange
-    const normalItems = [
-      new Item("Backstage passes to a TAFKAL80ETC concert", 0, 10),
-    ];
-    const sut = new GildedRose(normalItems);
+    const backstagePass = [new BackstagePass(0, 10)];
+    const sut = new GildedRose(backstagePass);
 
     // Act
     const actual = sut.updateQuality();
@@ -232,9 +227,9 @@ describe("Multiple items", () => {
     // Arrange
     const items = [
       new Item("foo", 1, 1),
-      new Item("Aged Brie", 1, 1),
-      new Item("Sulfuras, Hand of Ragnaros", 1, 1),
-      new Item("Backstage passes to a TAFKAL80ETC concert", 1, 1),
+      new AgedBrie(1, 1),
+      new Sulfuras(),
+      new BackstagePass(1, 1),
     ];
     const sut = new GildedRose(items);
 
@@ -244,11 +239,9 @@ describe("Multiple items", () => {
     // Assert
     expect(actual.length).toBe(4);
     expect(actual[0]).toEqual(new Item("foo", 0, 0));
-    expect(actual[1]).toEqual(new Item("Aged Brie", 0, 2));
-    expect(actual[2]).toEqual(new Item("Sulfuras, Hand of Ragnaros", 1, 1));
-    expect(actual[3]).toEqual(
-      new Item("Backstage passes to a TAFKAL80ETC concert", 0, 4)
-    );
+    expect(actual[1]).toEqual(new AgedBrie(0, 2));
+    expect(actual[2]).toEqual(new Sulfuras());
+    expect(actual[3]).toEqual(new BackstagePass(0, 4));
   });
 });
 
